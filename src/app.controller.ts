@@ -43,6 +43,7 @@ export class AppController {
       await this.appService.clock('in');
       return ApiResponse.send(new ApiSuccessResponse(null, 'Clocked In'), []);
     } catch (e) {
+      console.log(e);
       return ApiResponse.send(e, []);
     }
   }
@@ -53,6 +54,7 @@ export class AppController {
       await this.appService.clock('out');
       return ApiResponse.send(new ApiSuccessResponse(null, 'Clocked Out'), []);
     } catch (e) {
+      console.log(e);
       return ApiResponse.send(e, []);
     }
   }

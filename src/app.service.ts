@@ -8,6 +8,7 @@ import { Browser, ClickOptions, Frame, HandleFor, Page } from 'puppeteer';
 import { TwoCaptchaService } from './two-captcha.service';
 import { RedisService } from './redis.service';
 import { getLaunchOptions, pup } from './puppeteer.extension';
+import { timeout } from 'rxjs';
 
 export type ClockType = 'in' | 'out';
 
@@ -27,16 +28,29 @@ export class AppService {
     await page.evaluate(jquery_ev_fn);
   }
 
+  async $click(page: Page, selector: string) {
+    await page.evaluate((_selector) => {
+      $(_selector).last().trigger('click');
+    }, selector);
+  }
+
   async xClick<T extends HTMLElement>(
     page: Page,
     xPath: string,
-    options: ClickOptions & { index?: number } = {},
+    options: ClickOptions & { index?: number; timeout?: number } = {},
   ) {
     if (!options?.index) {
       options.index = 0;
     }
+    await page.waitForXPath(xPath, { timeout: options?.timeout || 5000 });
     const elements = (await page?.$x(xPath)) as HandleFor<T>[];
-    await elements[options?.index]?.click();
+    const tempOptions = JSON.parse(JSON.stringify(options));
+    try {
+      delete tempOptions?.index;
+      delete tempOptions?.timeout;
+    } catch (e) {}
+    const clickOptions: ClickOptions = options;
+    await elements[options?.index]?.click(clickOptions);
   }
 
   createCacheDirectory(dirname: string) {
@@ -68,7 +82,7 @@ export class AppService {
 
     await delay(1000);
     await this.xClick(page, `//button[contains(.,"Send OTP")]`, { delay: 40 });
-
+    console.log('OTP sent');
     await delay(3000);
 
     const captchaImageSelector = '#imgCaptcha';
@@ -117,6 +131,16 @@ export class AppService {
     await delay(500);
 
     await this.xClick(page, '//button[contains(.,"Login")]', { delay: 40 });
+    let flag = false;
+    try {
+      await page.waitForXPath('//div[contains(.,"Invalid")]', {
+        timeout: 5000,
+      });
+      flag = true;
+    } catch (e) {}
+    if (flag) {
+      throw new Error('Login failed');
+    }
   }
 
   async close(page: Page, browser: Browser) {
@@ -137,37 +161,56 @@ export class AppService {
         'geolocation',
       ]);
 
-      await page.goto('https://shipthis.keka.com', {
-        waitUntil: 'networkidle0',
-      });
-      await this.injectLocalJquery(page);
-
-      await this.login(page);
-      await delay(5000);
-
-      if (clockType == 'in') {
-        await this.xClick(page, '//button[contains(.,"Web Clock-In")]', {
-          delay: 40,
-        });
-      } else if (clockType == 'out') {
-        await this.xClick(page, '//button[contains(.,"Web Clock-Out")]', {
-          delay: 40,
-        });
+      const arr = [0, 1, 2, 3];
+      let login = false;
+      for await (const _ of arr) {
+        try {
+          await page.goto('https://shipthis.keka.com', {
+            waitUntil: 'networkidle0',
+          });
+          await this.injectLocalJquery(page);
+          await this.login(page);
+          login = true;
+          break;
+        } catch (e) {
+          login = false;
+        }
+      }
+      if (!login) {
+        throw new Error('Login failed');
       }
 
-      await delay(3000);
-      await this.xClick(page, '//button[contains(.,"Confirm")]', { delay: 40 });
-      await page.evaluate(() => {
-        $("button:contains('Confirm')").last().trigger('click');
+      // clockType == 'in'
+      const getButtonText = (condition: boolean) =>
+        condition ? 'Clock-In' : 'Clock-out';
+      const clockingSelector = getButtonText(clockType == 'in');
+      const waitSelector = (text: string) => `//button[contains(.,"${text}")]`;
+      const buttonSelector = (text: string) => `:contains("${text}")`;
+      await page.waitForXPath(waitSelector(clockingSelector), {
+        timeout: 10_000,
       });
-      await delay(10_000);
+      await this.injectLocalJquery(page);
+      await this.$click(page, buttonSelector(clockingSelector));
+      await this.$click(page, buttonSelector(clockingSelector));
+
+      await page.waitForXPath('//button[contains(.,"Confirm")]', {
+        timeout: 5000,
+      });
+      await delay(3000);
+
+      await page.waitForXPath(waitSelector('Confirm'), { timeout: 7000 });
+      await this.$click(page, buttonSelector('Confirm'));
+
+      await delay(5_000);
+      await page.waitForXPath(
+        waitSelector(getButtonText(!(clockType == 'in'))),
+      );
 
       await this.close(page, browser);
     } catch (e) {
       console.log(e);
 
       await this.close(page, browser);
-
       throw e;
     }
   }
