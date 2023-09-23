@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TwoCaptchaService } from './two-captcha.service';
 import { RedisService } from './redis.service';
 import { ConfigModule } from '@nestjs/config';
+import { ImageUploadService } from './image-upload.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, TwoCaptchaService, RedisService],
+  providers: [AppService, TwoCaptchaService, RedisService, ImageUploadService],
 })
 export class AppModule implements OnModuleInit, OnApplicationShutdown {
   constructor(private readonly redisService: RedisService) {}

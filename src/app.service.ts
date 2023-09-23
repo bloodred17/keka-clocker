@@ -8,15 +8,21 @@ import { Browser, ClickOptions, Frame, HandleFor, Page } from 'puppeteer';
 import { TwoCaptchaService } from './two-captcha.service';
 import { RedisService } from './redis.service';
 import { getLaunchOptions, pup } from './puppeteer.extension';
-import { timeout } from 'rxjs';
+import {ImageUploadService} from "./image-upload.service";
 
 export type ClockType = 'in' | 'out';
 
 @Injectable()
 export class AppService {
+  public readonly dashboardImage = {
+    filename: 'dashboard.png',
+    path: Path.join('./cache', 'dashboard.png'),
+  }
+
   constructor(
     private readonly twoCaptchaService: TwoCaptchaService,
     private readonly redisService: RedisService,
+    private readonly imageService: ImageUploadService,
   ) {}
 
   async injectLocalJquery(page: Page | Frame) {
@@ -180,7 +186,20 @@ export class AppService {
         throw new Error('Login failed');
       }
 
-      // clockType == 'in'
+      try {
+        await page.waitForXPath(`//*[contains(@class, "d-flex dashboard")]`, {timeout: 7000});
+        await page.screenshot({
+          path: this.dashboardImage.path,
+        });
+        const image = await Fsp.readFile(
+            this.dashboardImage.path,
+        );
+        await this.imageService.uploadImage(image);
+      } catch (e) {
+        console.log(e);
+        throw new Error('Failed to get Dashboard');
+      }
+
       const getButtonText = (condition: boolean) =>
         condition ? 'Clock-In' : 'Clock-out';
       const clockingSelector = getButtonText(clockType == 'in');
