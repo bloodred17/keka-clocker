@@ -5,12 +5,6 @@
 [//]: # (<p align="center">Made with <a href="http://nestjs.com" target="_blank">NestJS</a>. A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>)
 
 <h1 align="center">Keka Clocker</h1>
-<p align="center">
-    <a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
- </p>
-
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
 
@@ -23,7 +17,8 @@ Clocker for [Keka](https://www.keka.com/).
 
 ## Requirements
 
-Node v18.13 <br>
+![Static Badge](https://img.shields.io/badge/node-v18.13-green) <br>
+
 
 Environment variables:
 ```dotenv
@@ -31,6 +26,7 @@ REDIS=""
 TWOCAPTCHAKEY=""
 ```
 
+>I recommend [Volta](https://volta.sh) for version switching.
 
 ## Installation
 
