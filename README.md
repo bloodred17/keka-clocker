@@ -21,6 +21,17 @@ Clocker for [Keka](https://www.keka.com/).
 - Endpoints for __Clocking-In__ and __Clocking-out__
 - OTP and Captcha handling
 
+## Requirements
+
+Node v18.13 <br>
+
+Environment variables:
+```dotenv
+REDIS=""
+TWOCAPTCHAKEY=""
+```
+
+
 ## Installation
 
 ```bash
@@ -40,9 +51,10 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Issues
+## Working
 
-
+User will need to send the full OTP message to `/opt/<text_message>` within 10 seconds of receiving the sms. <br>
+Can be automated using [Macrodroid](https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid), [Tasker](https://tasker.joaoapps.com/), [IFTTT](https://ifttt.com/) etc.
 
 ## Stay in touch
 

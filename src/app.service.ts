@@ -17,7 +17,7 @@ export class AppService {
   public readonly dashboardImage = {
     filename: 'dashboard.png',
     path: Path.join('./cache', 'dashboard.png'),
-  }
+  };
 
   constructor(
     private readonly twoCaptchaService: TwoCaptchaService,
