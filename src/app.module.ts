@@ -1,4 +1,4 @@
-import { Module, OnApplicationShutdown, OnModuleInit } from "@nestjs/common";
+import { Module, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TwoCaptchaService } from './two-captcha.service';

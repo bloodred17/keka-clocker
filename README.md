@@ -1,13 +1,10 @@
 <p align="center">
-
-  <a href="http://keka.com/" target="blank"><img src="https://d2w2i7rp1a0wob.cloudfront.net/static/images/logos/KekaLogoBlack.svg" width="200" alt="Nest Logo" /></a>
-
+<a href="http://keka.com/" target="_blank"><img src="https://d2w2i7rp1a0wob.cloudfront.net/static/images/logos/KekaLogoBlack.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
 [//]: # (<p align="center">Made with <a href="http://nestjs.com" target="_blank">NestJS</a>. A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>)
 
 <h1 align="center">Keka Clocker</h1>
-
 <p align="center">
     <a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
  </p>

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Solver } from '2captcha';
+import * as process from "process";
 
 export interface BaseSolve {
   default?: any;
@@ -52,7 +53,7 @@ export interface CaptchaInitOption {
 
 @Injectable()
 export class TwoCaptchaService {
-  private readonly apiKey: string = 'ce9886a648ac254d0ba010efc0efecac';
+  private readonly apiKey: string = process.env.TWOCAPTCHAKEY;
   private readonly solver: Solver = new Solver(this.apiKey);
 
   async imageCaptcha(
