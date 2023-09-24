@@ -6,9 +6,7 @@
 
 <h1 align="center">Keka Clocker</h1>
 
-## Description
-
-Clocker for [Keka](https://www.keka.com/).
+<p align="center">Clocker for <a herf="https://www.keka.com/" target="_blank">Keka</a>. </p>
 
 ## Features
 
