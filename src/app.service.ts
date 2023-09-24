@@ -187,7 +187,8 @@ export class AppService {
       }
 
       try {
-        await page.waitForXPath(`//*[contains(@class, "d-flex dashboard")]`, {timeout: 7000});
+        await page.waitForXPath(`//*[contains(@class, "d-flex dashboard")]`, {timeout: 30_000});
+      } catch (e) {
         await page.screenshot({
           path: this.dashboardImage.path,
         });
@@ -195,9 +196,8 @@ export class AppService {
             this.dashboardImage.path,
         );
         await this.imageService.uploadImage(image);
-      } catch (e) {
-        console.log(e);
-        throw new Error('Failed to get Dashboard');
+
+        throw e;
       }
 
       const getButtonText = (condition: boolean) =>
@@ -213,16 +213,15 @@ export class AppService {
       await this.$click(page, buttonSelector(clockingSelector));
 
       await page.waitForXPath('//button[contains(.,"Confirm")]', {
-        timeout: 5000,
+        timeout: 10_000,
       });
-      await delay(3000);
 
-      await page.waitForXPath(waitSelector('Confirm'), { timeout: 7000 });
+      await page.waitForXPath(waitSelector('Confirm'), { timeout: 15_000 });
       await this.$click(page, buttonSelector('Confirm'));
 
-      await delay(5_000);
       await page.waitForXPath(
         waitSelector(getButtonText(!(clockType == 'in'))),
+        { timeout: 10_000 }
       );
 
       await this.close(page, browser);
