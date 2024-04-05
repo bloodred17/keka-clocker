@@ -8,7 +8,7 @@ import { Browser, ClickOptions, Frame, HandleFor, Page } from 'puppeteer';
 import { TwoCaptchaService } from './two-captcha.service';
 import { RedisService } from './redis.service';
 import { getLaunchOptions, pup } from './puppeteer.extension';
-import {ImageUploadService} from "./image-upload.service";
+import { ImageUploadService } from './image-upload.service';
 
 export type ClockType = 'in' | 'out';
 
@@ -187,14 +187,14 @@ export class AppService {
       }
 
       try {
-        await page.waitForXPath(`//*[contains(@class, "d-flex dashboard")]`, {timeout: 30_000});
+        await page.waitForXPath(`//*[contains(@class, "d-flex dashboard")]`, {
+          timeout: 30_000,
+        });
       } catch (e) {
         await page.screenshot({
           path: this.dashboardImage.path,
         });
-        const image = await Fsp.readFile(
-            this.dashboardImage.path,
-        );
+        const image = await Fsp.readFile(this.dashboardImage.path);
         await this.imageService.uploadImage(image);
 
         throw e;
@@ -221,7 +221,7 @@ export class AppService {
 
       await page.waitForXPath(
         waitSelector(getButtonText(!(clockType == 'in'))),
-        { timeout: 10_000 }
+        { timeout: 10_000 },
       );
 
       await this.close(page, browser);
