@@ -2,16 +2,19 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiResponse, ApiSuccessResponse } from 'tc-response-model';
 import { RedisService } from './redis.service';
+import { TaskService } from './task.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly redisService: RedisService,
+    private readonly taskService: TaskService,
   ) {}
 
   @Get()
-  getHello(): ApiResponse {
+  async getHello(): Promise<ApiResponse> {
+    // await this.taskService.sendSMS();
     return ApiResponse.send(new ApiSuccessResponse(null, 'Hello'), []);
   }
 

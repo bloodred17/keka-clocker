@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Solver } from '2captcha';
-import * as process from "process";
 
 export interface BaseSolve {
   default?: any;
