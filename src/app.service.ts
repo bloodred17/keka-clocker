@@ -14,6 +14,9 @@ export type ClockType = 'in' | 'out';
 
 @Injectable()
 export class AppService {
+  private readonly userCell: string = process.env.USERCELL;
+  private readonly twoCaptchaKey: string = process.env.TWOCAPTCHAKEY;
+
   public readonly dashboardImage = {
     filename: 'dashboard.png',
     path: Path.join('./cache', 'dashboard.png'),
@@ -23,7 +26,19 @@ export class AppService {
     private readonly twoCaptchaService: TwoCaptchaService,
     private readonly redisService: RedisService,
     private readonly imageService: ImageUploadService,
-  ) {}
+  ) {
+    if (!this.userCell) {
+      throw new Error(
+        'Please provide registered employee mobile number. Environment variable: USERCELL',
+      );
+    }
+
+    if (!this.twoCaptchaKey) {
+      throw new Error(
+        'Please provide a valid 2Captcha api key for captcha solver to work. Environment variable: TWOCAPTCHAKEY',
+      );
+    }
+  }
 
   async injectLocalJquery(page: Page | Frame) {
     const file = await Fsp.readFile(
@@ -84,7 +99,7 @@ export class AppService {
     });
 
     await delay(3000);
-    await page.type('#mobileNumber', '7077100772', { delay: 40 });
+    await page.type('#mobileNumber', process.env.USERCELL, { delay: 40 });
 
     await delay(1000);
     await this.xClick(page, `//button[contains(.,"Send OTP")]`, { delay: 40 });

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { AppService } from './app.service';
 import { Twilio } from 'twilio';
+import { red } from 'chalk';
 
 @Injectable()
 export class TaskService {
@@ -9,13 +10,27 @@ export class TaskService {
   readonly twilioClient: Twilio;
 
   constructor(private readonly appService: AppService) {
-    this.twilioClient = new Twilio(this.twilioCred[0], this.twilioCred[1]);
+    if (this.twilioCred) {
+      this.twilioClient = new Twilio(this.twilioCred[0], this.twilioCred[1]);
+    } else {
+      console.warn(
+        red(
+          'Task scheduler will not work without Twilio credential <username>:<password>. Environment variable: TWILIO',
+        ),
+      );
+    }
   }
 
   async sendSMS(body: string) {
+    if (!this.twilioClient) {
+      console.log(body);
+      throw new Error(
+        `Twilio client is not set up. Provide Twilio credential <username>:<password>`,
+      );
+    }
     const message = await this.twilioClient.messages.create({
-      from: '+13342493624',
-      to: '+917077100772',
+      from: process.env.TWILIO_NUMBER,
+      to: '+91' + process.env.USERCELL,
       body,
     });
     console.log(message);
@@ -46,6 +61,6 @@ export class TaskService {
   //   timeZone: 'Asia/Kolkata',
   // })
   // async check() {
-  //   console.log('cron is working');
+  //   console.log('cron is working' + process.env.USERCELL);
   // }
 }

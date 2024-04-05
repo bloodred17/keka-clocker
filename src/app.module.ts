@@ -8,13 +8,16 @@ import { ImageUploadService } from './image-upload.service';
 import { TaskService } from './task.service';
 import { ScheduleModule } from '@nestjs/schedule';
 
+const imports = [
+  ConfigModule.forRoot({
+    ignoreEnvFile: !!process.env.K_SERVICE,
+  }),
+];
+
+if (process.env.TWILIO) imports.push(ScheduleModule.forRoot());
+
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      ignoreEnvFile: !!process.env.K_SERVICE,
-    }),
-    ScheduleModule.forRoot(),
-  ],
+  imports,
   controllers: [AppController],
   providers: [
     AppService,
