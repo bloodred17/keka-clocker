@@ -3,13 +3,18 @@ import { Cron } from '@nestjs/schedule';
 import { AppService } from './app.service';
 import { Twilio } from 'twilio';
 import { red } from 'chalk';
+import { RedisService } from './redis.service';
+import { formatDate } from './util';
 
 @Injectable()
 export class TaskService {
   private readonly twilioCred = process.env.TWILIO?.split(':');
   readonly twilioClient: Twilio;
 
-  constructor(private readonly appService: AppService) {
+  constructor(
+    private readonly appService: AppService,
+    private readonly redisService: RedisService,
+  ) {
     if (this.twilioCred) {
       this.twilioClient = new Twilio(this.twilioCred[0], this.twilioCred[1]);
     } else {
@@ -38,23 +43,38 @@ export class TaskService {
 
   // Todo: Check if on leave
 
-  @Cron('0 0 10 * * MON-FRI', {
-    name: 'clock_in',
-    timeZone: 'Asia/Kolkata',
-  })
-  async clockIn() {
-    await this.appService.clock('in');
-    await this.sendSMS('Clocked in');
+  async checkStatus(status: string) {
+    const todayDate = formatDate(new Date());
+    const statusValue = await this.redisService.client.get(status);
+    return statusValue === todayDate;
   }
+  // await this.redisService.client.set(status, todayDate, { EX: 60 });
 
-  @Cron('0 30 19 * * MON-FRI', {
-    name: 'clock_out',
-    timeZone: 'Asia/Kolkata',
-  })
-  async clockOut() {
-    await this.appService.clock('out');
-    await this.sendSMS('Clocked out');
-  }
+  // @Cron('0 0 10 * * MON-FRI', {
+  //   name: 'clock_in',
+  //   timeZone: 'Asia/Kolkata',
+  // })
+  // async clockIn() {
+  //   try {
+  //     // const clockedIn = await this.checkStatus();
+  //     // if (clockedIn) {
+  //     //   throw new Error('Already clocked in');
+  //     // }
+  //     await this.appService.clock('in');
+  //     await this.sendSMS('Clocked in');
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+  //
+  // @Cron('0 30 19 * * MON-FRI', {
+  //   name: 'clock_out',
+  //   timeZone: 'Asia/Kolkata',
+  // })
+  // async clockOut() {
+  //   await this.appService.clock('out');
+  //   await this.sendSMS('Clocked out');
+  // }
 
   // @Cron('*/10 * * * * *', {
   //   name: 'check',

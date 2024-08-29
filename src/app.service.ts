@@ -97,7 +97,6 @@ export class AppService {
     await this.xClick(page, `//button[contains(.,"Mobile OTP")]`, {
       delay: 40,
     });
-
     await delay(3000);
     await page.type('#mobileNumber', process.env.USERCELL, { delay: 40 });
 
@@ -146,9 +145,12 @@ export class AppService {
       throw new Error('OTP not found!');
     }
     await page.type('#otp', otp);
+    console.log('Mobile OTP entered');
 
     const solution = await solution$;
     await page.type('#captcha', solution?.data);
+    console.log('Captcha entered');
+
     await delay(500);
 
     await this.xClick(page, '//button[contains(.,"Login")]', { delay: 40 });
@@ -200,7 +202,7 @@ export class AppService {
       if (!login) {
         throw new Error('Login failed');
       }
-
+      console.log('Logged In');
       try {
         await page.waitForXPath(`//*[contains(@class, "d-flex dashboard")]`, {
           timeout: 30_000,
@@ -238,7 +240,7 @@ export class AppService {
         waitSelector(getButtonText(!(clockType == 'in'))),
         { timeout: 10_000 },
       );
-
+      console.log('Clocked');
       await this.close(page, browser);
     } catch (e) {
       console.log(e);
