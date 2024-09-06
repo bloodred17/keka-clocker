@@ -217,15 +217,24 @@ export class AppService {
         throw e;
       }
 
+      await this.injectLocalJquery(page);
       const getButtonText = (condition: boolean) =>
         condition ? 'Clock-In' : 'Clock-out';
       const clockingSelector = getButtonText(clockType == 'in');
       const waitSelector = (text: string) => `//button[contains(.,"${text}")]`;
       const buttonSelector = (text: string) => `:contains("${text}")`;
+      for await (const _ of [...Array(4).keys()]) {
+        try {
+          await page.waitForXPath(waitSelector(clockingSelector), {
+            timeout: 10_000,
+          });
+        } catch (e) {
+          await page.reload({ waitUntil: 'networkidle0' });
+        }
+      }
       await page.waitForXPath(waitSelector(clockingSelector), {
         timeout: 10_000,
       });
-      await this.injectLocalJquery(page);
       await this.$click(page, buttonSelector(clockingSelector));
       await this.$click(page, buttonSelector(clockingSelector));
 
